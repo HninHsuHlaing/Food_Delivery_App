@@ -10,13 +10,13 @@ import kotlinx.android.synthetic.main.view_holder_popular_choice.view.*
 
 
 class PopularChoiceViewHolder(itemView: View, private val mDelegate: PopularViewItemActionDelegate) :
-    BaseViewHolder<FoodItemVO>(itemView) {
+        BaseViewHolder<FoodItemVO>(itemView) {
 
     override fun bindData(data: FoodItemVO) {
         data?.let {
-          //  itemView.tv_restaurant_name.text = data.
+            itemView.tv_restaurant_name.text =data.food_name
             itemView.tv_food_description.text =data.food_description
-            itemView.tv_food_rating.text =data.food_rating+"Stars"
+            itemView.tv_food_rating.text =data.food_rating
             data?.food_image?.let{
                 ImageUtils().showImageWithoutCrop(itemView.img_fooditem,it)
             }

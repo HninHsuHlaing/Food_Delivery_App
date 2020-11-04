@@ -25,7 +25,7 @@ interface FoodDeliveryModel {
 
     fun getRestaurants(onSuccess: (List<RestaurantVO>) -> Unit, onFaiure: (String) -> Unit)
 
-    fun getFoodItems(documentId: String, onSuccess: (List<FoodItemVO>, RestaurantVO) -> Unit, onFaiure: (String) -> Unit)
+    fun getFoodItems(documentId: String, onSuccess: (List<FoodItemVO>,RestaurantVO,List<FoodItemVO>) -> Unit, onFaiure: (String) -> Unit)
 
     fun getPopularChoiceList(onSuccess: (List<FoodItemVO>) -> Unit, onFaiure: (String) -> Unit)
 
@@ -33,5 +33,10 @@ interface FoodDeliveryModel {
 
     fun addOrUpdateFoodItem(foodItemVO: FoodItemVO)
 
-    fun removeFoodItem(id: String)
+    fun removeFoodItem(name: String)
+
+    fun getCartItemCount(onSuccess: (cartCount: Long) -> Unit, onFialure: (String) -> Unit)
+
+    fun getTotalPrice(onSuccess: (cartCount: Long) -> Unit, onFialure: (String) -> Unit)
+
 }

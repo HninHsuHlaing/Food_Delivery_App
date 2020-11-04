@@ -16,18 +16,19 @@ object FirebaseAuthManager : AuthManager {
             onFailure: (String) -> Unit
     )
     {
+
         mFirebaseAuth.currentUser?.updateProfile(UserProfileChangeRequest.Builder().
         setPhotoUri( Uri.parse(photoUrl)).build())?.addOnCompleteListener {
             task -> if(task.isSuccessful)
-                    {   onSuccess() } else{  onFailure("Fail Profile Update")}
+        {   onSuccess() } else{  onFailure("Fail Profile Update")}
         }
     }
 
     override fun login(
-        email: String,
-        password: String,
-        onSuccess: () -> Unit,
-        onFailure: (String) -> Unit
+            email: String,
+            password: String,
+            onSuccess: () -> Unit,
+            onFailure: (String) -> Unit
     ) {
         mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if(it.isSuccessful && it.isComplete){
@@ -39,17 +40,17 @@ object FirebaseAuthManager : AuthManager {
     }
 
     override fun register(
-        username: String,
-        email: String,
-        password: String,
-        phone: String,
-        onSuccess: () -> Unit,
-        onFailure: (String) -> Unit
+            username: String,
+            email: String,
+            password: String,
+            phone: String,
+            onSuccess: () -> Unit,
+            onFailure: (String) -> Unit
     ) {
         mFirebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful && it.isComplete) {
                 mFirebaseAuth.currentUser?.updateProfile(
-                    UserProfileChangeRequest.Builder().setDisplayName(username).build()
+                        UserProfileChangeRequest.Builder().setDisplayName(username).build()
                 )
                 onSuccess()
             } else {
@@ -66,7 +67,7 @@ object FirebaseAuthManager : AuthManager {
             userVO?.email = user.email.toString()
             userVO?.photoUrl = user.photoUrl.toString()
             Log.d(ContentValues.TAG, "User profile updated."+ user.photoUrl.toString())
-        //    userVO?.phone =  user.phoneNumber.toString()
+            //    userVO?.phone =  user.phoneNumber.toString()
             onSuccess(userVO)
         }else{
             onFailure("Empty UserData")

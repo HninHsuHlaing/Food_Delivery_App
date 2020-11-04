@@ -93,6 +93,7 @@ class RestaurantFragment : BaseFragment(), MainView {
         rc_category.visibility = View.VISIBLE
         ly_restaurant.visibility= View.GONE
         ly_popular.visibility =View.GONE
+        rc_popular_choice.visibility =View.GONE
         mRestaurantAdapter = RestaurantAdapter (mPresenter,0)
         rc_restaurants.adapter = mRestaurantAdapter
 
@@ -103,13 +104,14 @@ class RestaurantFragment : BaseFragment(), MainView {
         rc_category.visibility = View.GONE
         ly_restaurant.visibility= View.VISIBLE
         ly_popular.visibility =View.VISIBLE
+        rc_popular_choice.visibility =View.VISIBLE
         mRestaurantAdapter = RestaurantAdapter (mPresenter,1)
         rc_restaurants.adapter = mRestaurantAdapter
 
     }
 
     override fun navigateToDetailScreen(documentId: String) {
-        startActivity(  activity?.applicationContext?.let{ DetailActivity.newIntent(it, documentId)})
+        startActivity(  activity?.applicationContext?.let{DetailActivity.newIntent(it, documentId)})
     }
 
     override fun showErrorMessage(message: String) {

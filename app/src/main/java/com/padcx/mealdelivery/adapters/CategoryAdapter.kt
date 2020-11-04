@@ -20,4 +20,3 @@ class CategoryAdapter(private val mDelegate: CategoryViewItemActionDelegate) :
 
     }
 }
-

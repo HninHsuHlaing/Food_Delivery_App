@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,13 +19,15 @@ import com.padcx.mealdelivery.datas.vos.UserVO
 import com.padcx.mealdelivery.mvp.presenters.ProfilePresenter
 import com.padcx.mealdelivery.mvp.views.ProfileView
 import com.padcx.mealdelivery.R
+import com.padcx.mealdelivery.datas.models.AuthenticationModel
+import com.padcx.mealdelivery.datas.models.AuthenticationModelImpl
 import com.padcx.shared.util.ImageUtils
 import kotlinx.android.synthetic.main.fragment_account.*
 import mk.padc.share.activities.BaseFragment
 
 import java.io.IOException
 
-class AccountFragment : BaseFragment() , ProfileView {
+class AccountFragment : BaseFragment() ,ProfileView{
 
     private lateinit var mPresenter: ProfilePresenter
 
@@ -74,7 +77,7 @@ class AccountFragment : BaseFragment() , ProfileView {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+        if (requestCode == AccountFragment.PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             if (data == null || data.data == null) {
                 return
             }
@@ -84,6 +87,7 @@ class AccountFragment : BaseFragment() , ProfileView {
                     if (Build.VERSION.SDK_INT >= 29) {
                         val source: ImageDecoder.Source = ImageDecoder.createSource(context?.contentResolver!!, filePath)
                         bitmap = ImageDecoder.decodeBitmap(source)
+                        mPresenter.updateUserProfile(bitmap!!)
                         account_btngroup.visibility = View.VISIBLE
                         ImageUtils().showImage(img_profile.context,img_profile,null,filePath)
                     } else {
@@ -103,7 +107,7 @@ class AccountFragment : BaseFragment() , ProfileView {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST)
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), AccountFragment.PICK_IMAGE_REQUEST)
     }
 
     companion object {

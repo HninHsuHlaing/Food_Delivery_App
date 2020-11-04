@@ -20,8 +20,8 @@ class DetailViewHolder(itemView: View, private val mDelegate: DetailViewItemActi
         data?.let {
             itemView.tv_restaurant_name.text =data?.food_name
             itemView.tv_restaurant_description.text = data?.food_description
-            itemView.tv_restaurant_rating.text =data?.food_rating
-            itemView.tv_restaurant_price.text =data?.food_price+" $"
+            itemView.tv_restaurant_rating.text =data?.food_rating +"Stars"
+            itemView.tv_restaurant_price.text =data?.food_price.toString()+" $"
             data?.food_image?.let{
                 ImageUtils().showImageWithoutCrop(itemView.img_restaurant,it)
             }

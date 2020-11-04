@@ -2,7 +2,10 @@ package com.padcx.mealdelivery.network.impls
 
 import android.content.ContentValues.TAG
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.padcx.mealdelivery.datas.vos.CategoryVO
 import com.padcx.mealdelivery.datas.vos.FoodItemVO
 import com.padcx.mealdelivery.datas.vos.RestaurantVO
@@ -31,7 +34,7 @@ object CloudFirestoreFirebaseApiImpl : FirebaseApi {
         uploadTask.addOnFailureListener {
             onFailure("Update Profile Failed")
         }.addOnSuccessListener { taskSnapshot ->
-            Log.d(TAG, "User profile updated.")
+            Log.d("upload image", "User profile updated.")
         }
 
 
@@ -41,6 +44,7 @@ object CloudFirestoreFirebaseApiImpl : FirebaseApi {
             val imageUrl = task.result?.toString()
             imageUrl?.let { onSuccess(it) }
         }
+
 
     }
 
@@ -97,10 +101,11 @@ object CloudFirestoreFirebaseApiImpl : FirebaseApi {
 
     override fun getFoodItems(
             documentId: String,
-            onSuccess: (foodList: List<FoodItemVO>, restaurantVO : RestaurantVO) -> Unit,
+            onSuccess: (foodList: List<FoodItemVO>, restaurantVO: RestaurantVO, pfoodlist: List<FoodItemVO>) -> Unit,
             onFialure: (String) -> Unit
     ) {
-        var restaurant: RestaurantVO = RestaurantVO()
+        var restaurant: RestaurantVO  = RestaurantVO()
+        var foodList: MutableList<FoodItemVO> = arrayListOf()
         db.collection("restaurants").document(documentId)
                 .addSnapshotListener { value, error ->
                     error?.let {
@@ -117,14 +122,13 @@ object CloudFirestoreFirebaseApiImpl : FirebaseApi {
                         restaurant = restaurantVO
                     }
                 }
-
         db.collection("restaurants/${documentId}/fooditems")
                 .addSnapshotListener { value, error ->
                     error?.let {
                         onFialure(it.message ?: "Please check connection")
                     } ?: run{
 
-                        val foodList: MutableList<FoodItemVO> = arrayListOf()
+
 
                         val result = value?.documents ?: arrayListOf()
 
@@ -135,7 +139,27 @@ object CloudFirestoreFirebaseApiImpl : FirebaseApi {
                             val docsData = Gson().fromJson<FoodItemVO>(Data, FoodItemVO::class.java)
                             foodList.add(docsData)
                         }
-                        onSuccess(foodList ,restaurant)
+                      //  onSuccess(foodList ,restaurant,foodList)
+                    }
+                }
+        db.collection("restaurants/${documentId}/fooditems").whereEqualTo("popular","1")
+                .addSnapshotListener { value, error ->
+                    error?.let {
+                        onFialure(it.message ?: "Please check connection")
+                    } ?: run{
+
+                        val pfoodList: MutableList<FoodItemVO> = arrayListOf()
+
+                        val result = value?.documents ?: arrayListOf()
+
+                        for (document in result) {
+                            val hashmap = document.data
+                            hashmap?.put("id", document.id.toString())
+                            val Data = Gson().toJson(hashmap)
+                            val docsData = Gson().fromJson<FoodItemVO>(Data, FoodItemVO::class.java)
+                            pfoodList.add(docsData)
+                        }
+                        onSuccess(foodList ,restaurant,pfoodList)
                     }
                 }
     }
@@ -174,7 +198,7 @@ object CloudFirestoreFirebaseApiImpl : FirebaseApi {
                         onFialure(it.message ?: "Please check connection")
                     } ?: run{
 
-                        val popularList: MutableList<FoodItemVO> = arrayListOf()
+                        val orderList: MutableList<FoodItemVO> = arrayListOf()
 
                         val result = value?.documents ?: arrayListOf()
 
@@ -183,10 +207,10 @@ object CloudFirestoreFirebaseApiImpl : FirebaseApi {
                             hashmap?.put("id", document.id.toString())
                             val Data = Gson().toJson(hashmap)
                             val docsData = Gson().fromJson<FoodItemVO>(Data, FoodItemVO::class.java)
-                            popularList.add(docsData)
+                            orderList.add(docsData)
                         }
 
-                        onSuccess(popularList)
+                        onSuccess(orderList)
                     }
                 }
     }
@@ -210,5 +234,44 @@ object CloudFirestoreFirebaseApiImpl : FirebaseApi {
                 .addOnFailureListener { Log.d("Failure", "Failed to delete grocery") }
 
     }
+
+    override fun getCartItemCount(onSuccess: (cartCount: Long) -> Unit, onFialure: (String) -> Unit) {
+        db.collection("orders")
+                .addSnapshotListener { value, error ->
+                    error?.let {
+                        onFialure(it.message ?: "Please check connection")
+                    } ?: run{
+                        val result = value?.documents ?: arrayListOf()
+                        onSuccess(result.size.toLong())
+                    }
+                }
+    }
+
+    override fun getTotalPrice(onSuccess: (cartCount: Long) -> Unit, onFialure: (String) -> Unit) {
+        db.collection("orders")
+                .addSnapshotListener { value, error ->
+                    error?.let {
+                        onFialure(it.message ?: "Please check connection")
+                    } ?: run{
+                        val result = value?.documents ?: arrayListOf()
+                        val orderList: MutableList<FoodItemVO> = arrayListOf()
+
+                        for (document in result) {
+                            val hashmap = document.data
+                            hashmap?.put("id", document.id.toString())
+                            val Data = Gson().toJson(hashmap)
+                            val docsData = Gson().fromJson<FoodItemVO>(Data, FoodItemVO::class.java)
+                            orderList.add(docsData)
+                        }
+                        var totalAmount : Long =0
+                        for(entity in orderList)
+                        {
+                            totalAmount += entity.totalAmount
+                        }
+                        onSuccess(totalAmount)
+                    }
+                }
+    }
+
 
 }

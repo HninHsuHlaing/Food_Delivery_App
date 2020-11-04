@@ -3,6 +3,7 @@ package com.padcx.mealdelivery.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.padcx.mealdelivery.datas.vos.FoodItemVO
 import com.padcx.mealdelivery.datas.vos.RestaurantVO
@@ -46,7 +47,7 @@ class DetailActivity : BaseActivity() , DetailView {
 
         btn_viewcart.setOnClickListener {
             mRestaurantVO?.let {
-                startActivity(CheckOutActivity.newIntent(this, it?.name, it?.description, it?.image_url, it?.rating))
+                startActivity(CheckOutActivity.newIntent(this,it?.name,it?.description,it?.image_url,it?.rating))
             }
 
         }
@@ -68,7 +69,8 @@ class DetailActivity : BaseActivity() , DetailView {
     private fun setUpPresenter() {
         mPresenter = getPresenter<DetailPresenterImpl, DetailView>()
         mPresenter.onUiReady(this)
-        mPresenter.onfetchReastaurantData(this,intent.getStringExtra(PARM_DOCUMENTID).toString())
+        // mPresenter.onfetchReastaurantData(this,intent.getStringExtra(PARM_DOCUMENTID).toString())
+        mPresenter.onRestaurantRecieved(this,intent.getStringExtra(PARM_DOCUMENTID).toString())
     }
 
 
@@ -89,5 +91,16 @@ class DetailActivity : BaseActivity() , DetailView {
     override fun showFoodItemList(foodList: List<FoodItemVO>) {
         mDetailAdapter.setNewData(foodList as MutableList<FoodItemVO>)
     }
+
+    override fun showViewCartCount(cartCount: Long) {
+        if(cartCount>0)
+        {
+            btn_viewcart.visibility= View.VISIBLE
+            btn_viewcart.text="View Cart ${cartCount} items"
+        }else{
+            btn_viewcart.visibility= View.GONE
+        }
+    }
+
 
 }

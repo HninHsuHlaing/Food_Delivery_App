@@ -5,6 +5,6 @@ import com.padcx.shared.mvp.view.BaseView
 
 interface CheckoutView : BaseView {
     fun showOrderList(orderList: List<FoodItemVO>)
-    fun showCalculationCharge()
+    fun showCalculationCharge(totalAmount: Long)
 
 }

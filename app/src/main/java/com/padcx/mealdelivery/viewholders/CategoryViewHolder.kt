@@ -11,12 +11,12 @@ class CategoryViewHolder(itemView: View, private val mDelegate: CategoryViewItem
         BaseViewHolder<CategoryVO>(itemView) {
 
     override fun bindData(data: CategoryVO) {
-       data?.let {
-           itemView.tv_category.text =data.category_name
-           data?.category_image?.let{
-               ImageUtils().showImageWithoutCrop(itemView.img_category,it)
-           }
+        data?.let {
+            itemView.tv_category.text =data.category_name
+            data?.category_image?.let{
+                ImageUtils().showImageWithoutCrop(itemView.img_category,it)
+            }
 
-       }
+        }
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="250dp"
-    android:layout_height="250dp"
+    android:layout_height="280dp"
     android:orientation="vertical"
     android:layout_margin="5dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -29,25 +29,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textColor="@color/black"
             android:text="Cafe Westen Fodd $"
             android:id="@+id/tv_food_description"
-            android:textSize="18sp"/>
-
+            android:textSize="14sp"/>
         <TextView
-            android:id="@+id/tv_food_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4.5 stars"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/red_A700"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:text="4.5 stars"
+            android:drawableLeft="@drawable/ic_baseline_star_rate_24"
+        android:id="@+id/tv_food_rating"
+        android:textSize="14sp"/>
 
     </LinearLayout>
 </LinearLayout>

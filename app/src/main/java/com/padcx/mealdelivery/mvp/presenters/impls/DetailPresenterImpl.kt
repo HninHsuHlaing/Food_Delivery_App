@@ -13,21 +13,40 @@ class DetailPresenterImpl : DetailPresenter, AbstractBasePresenter<DetailView>()
 
     private val foodDeliveryModel : FoodDeliveryModel = FoodDeliveryModelImpl
 
-    override fun onUiReady(owner: LifecycleOwner) {}
-    override fun onTapAddToCartAction(data: FoodItemVO) {
-
+    override fun onUiReady(owner: LifecycleOwner) {
+        foodDeliveryModel.getCartItemCount(
+                onSuccess = {
+                    mView?.showViewCartCount(it)
+                },
+                onFialure = {
+                    mView?.showError(it)
+                })
     }
 
-    override fun onfetchReastaurantData(owner: LifecycleOwner, documentId: String) {
+    override fun onTapAddToCartAction(data: FoodItemVO) {
+
+        var totalAmount= data.itemCount * data.food_price.toLong()
+        data.totalAmount= totalAmount
+        foodDeliveryModel.addOrUpdateFoodItem(data)
+
+        foodDeliveryModel.getCartItemCount(
+                onSuccess = {
+                    mView?.showViewCartCount(it)
+                },
+                onFialure = {
+                    mView?.showError(it)
+                })
+    }
+
+    override fun onRestaurantRecieved(owner: LifecycleOwner, documentId: String) {
 
         foodDeliveryModel.getFoodItems(
                 documentId,
                 onSuccess = {
-                    dataList, restaurant ->
+                    dataList, restaurant,pFoodlist ->
+                    val plist : MutableList<FoodItemVO>
                     mView.showPopularChoicesFoodItem(
-                            dataList.filter{
-                                data -> data.popular == "1"
-                            }
+                            pFoodlist
                     )
                     mView.showRestaurantData(restaurant)
                     mView.showFoodItemList(dataList)

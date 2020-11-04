@@ -31,4 +31,3 @@ class RestaurantAdapter(private val mDelegate: RestaurantViewItemActionDelegate,
     }
 }
 
-

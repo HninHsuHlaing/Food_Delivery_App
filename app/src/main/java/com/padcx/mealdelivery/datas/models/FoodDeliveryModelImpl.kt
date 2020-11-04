@@ -44,7 +44,7 @@ object FoodDeliveryModelImpl : FoodDeliveryModel {
 
     override fun getFoodItems(
             documentId: String,
-            onSuccess: (List<FoodItemVO>, RestaurantVO) -> Unit,
+            onSuccess: (List<FoodItemVO>, RestaurantVO, List<FoodItemVO>) -> Unit,
             onFaiure: (String) -> Unit
     ) {
         mFirebaseApi.getFoodItems(documentId,onSuccess, onFaiure)
@@ -64,6 +64,14 @@ object FoodDeliveryModelImpl : FoodDeliveryModel {
 
     override fun addOrUpdateFoodItem(foodItemVO: FoodItemVO) {
         mFirebaseApi.addOrUpdateFoodItem(foodItemVO)
+    }
+
+    override fun getCartItemCount(onSuccess: (cartCount: Long) -> Unit, onFialure: (String) -> Unit) {
+        mFirebaseApi.getCartItemCount(onSuccess,onFialure)
+    }
+
+    override fun getTotalPrice(onSuccess: (cartCount: Long) -> Unit, onFialure: (String) -> Unit) {
+        mFirebaseApi.getTotalPrice(onSuccess,onFialure)
     }
 
     override fun removeFoodItem(id: String) {

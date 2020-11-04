@@ -3,7 +3,9 @@ package com.padcx.mealdelivery.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.padcx.mealdelivery.datas.vos.FoodItemVO
 import com.padcx.mealdelivery.dialog.BottomSheetFragment
 import com.padcx.mealdelivery.mvp.presenters.CheckoutPresenter
@@ -13,24 +15,26 @@ import com.padcx.mealdelivery.R
 import com.padcx.mealdelivery.adapters.CheckOutAdapter
 import com.padcx.shared.util.ImageUtils
 import kotlinx.android.synthetic.main.activity_check_out.*
+import kotlinx.android.synthetic.main.checkout_success_layout.view.*
 import kotlinx.android.synthetic.main.view_holder_restaurant_vertical_viewtype.*
 
 import mk.padc.share.activities.BaseActivity
 
-class CheckOutActivity : BaseActivity() , CheckoutView {
+class CheckOutActivity : BaseActivity(), CheckoutView {
 
     private lateinit var mPresenter: CheckoutPresenter
     private lateinit var mAdapter: CheckOutAdapter
+    private lateinit var mOrderList: List<FoodItemVO>
 
     companion object {
         const val PARM_RESTAURANT_IMAGE = "PARM_RESTAURANT_IMAGE"
         const val PARM_RESTAURANT_NAME = "PARM_RESTAURANT_NAME"
         const val PARM_RESTAURANT_DESRIPTION = "PARM_RESTAURANT_DESRIPTION"
-        const val PARM_RESTAURANT_RATING= "PARM_RESTAURANT_RATING"
+        const val PARM_RESTAURANT_RATING = "PARM_RESTAURANT_RATING"
         fun newIntent(context: Context,
                       restaurant_name: String?, restaurant_description: String?,
                       restaurant_image: String?, restaurant_rating: String?
-        ) : Intent {
+        ): Intent {
             val intent = Intent(context, CheckOutActivity::class.java)
             intent.putExtra(PARM_RESTAURANT_IMAGE, restaurant_image)
             intent.putExtra(PARM_RESTAURANT_NAME, restaurant_name)
@@ -39,6 +43,7 @@ class CheckOutActivity : BaseActivity() , CheckoutView {
             return intent
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_out)
@@ -47,21 +52,26 @@ class CheckOutActivity : BaseActivity() , CheckoutView {
         setUpRecyclerView()
         setUpActionListener()
     }
-    private fun initView()
-    {
-        tv_restaurant_name.text =    intent.getStringExtra(PARM_RESTAURANT_NAME).toString()
-        tv_restaurant_description.text =     intent.getStringExtra(PARM_RESTAURANT_DESRIPTION).toString()
-        tv_restaurant_rating.text =    intent.getStringExtra(PARM_RESTAURANT_RATING).toString()
-        intent.getStringExtra(PARM_RESTAURANT_IMAGE)?.let{
-            ImageUtils().showImageWithoutCrop(img_restaurant,it)
+
+    private fun initView() {
+        tv_restaurant_name.text = intent.getStringExtra(PARM_RESTAURANT_NAME).toString()
+        tv_restaurant_description.text = intent.getStringExtra(PARM_RESTAURANT_DESRIPTION).toString()
+        tv_restaurant_rating.text = intent.getStringExtra(PARM_RESTAURANT_RATING).toString()
+        intent.getStringExtra(PARM_RESTAURANT_IMAGE)?.let {
+            ImageUtils().showImageWithoutCrop(img_restaurant, it)
         }
     }
-    private fun setUpActionListener()
-    {
-        btn_checkout.setOnClickListener{
-            showBottomSheetDialogFragment()
+
+    private fun setUpActionListener() {
+        btn_checkout.setOnClickListener {
+            if(mOrderList.isNotEmpty()) {
+                showBottomSheetDialog()
+            }else
+            {
+                Toast.makeText(this,"Empty Cart Item",Toast.LENGTH_LONG).show()
+            }
         }
-        ll_backpress.setOnClickListener{
+        ll_backpress.setOnClickListener {
             onBackPressed()
         }
     }
@@ -69,16 +79,37 @@ class CheckOutActivity : BaseActivity() , CheckoutView {
     override fun onBackPressed() {
         super.onBackPressed()
     }
-    private fun showBottomSheetDialogFragment() {
-        val bottomSheetFragment = BottomSheetFragment()
-        bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
+
+
+    private fun showBottomSheetDialog() {
+        val view = layoutInflater.inflate(R.layout.checkout_success_layout, null)
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(view)
+
+        view.btn_order_track.setOnClickListener {
+
+            Toast.makeText(this, "Order Track Clicked", Toast.LENGTH_SHORT).show()
+            dialog?.dismiss()
+            mPresenter.onTapCheckout(orderList = mOrderList)
+            exitActivity()
+
+        }
+        view.btn_order_something.setOnClickListener {
+            Toast.makeText(this, "Order Cancel Clicked", Toast.LENGTH_SHORT).show()
+            dialog?.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun exitActivity() {
+        this.finish()
     }
 
     private fun setUpRecyclerView() {
 
         rc_orderList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        mAdapter = CheckOutAdapter (mPresenter)
+        mAdapter = CheckOutAdapter(mPresenter)
         rc_orderList.adapter = mAdapter
 
     }
@@ -91,10 +122,13 @@ class CheckOutActivity : BaseActivity() , CheckoutView {
     }
 
     override fun showOrderList(orderList: List<FoodItemVO>) {
+        mOrderList = orderList
         mAdapter.setNewData(orderList as MutableList<FoodItemVO>)
     }
 
-    override fun showCalculationCharge() {
-        //tv_totalamount
+    override fun showCalculationCharge(totalPrice: Long) {
+
+        tv_total_Amount.text = "${totalPrice} $"
+
     }
 }
